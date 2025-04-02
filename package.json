@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tailwindcss -i ./frontend/src/styles/main.css -o ./frontend/dist/output.css --minify"
+    "build": "tailwindcss -i ./src/styles/main.css -o ./public/output.css --minify",
+    "vercel-build": "npm run build"
   },
   "keywords": [],
   "author": "",
