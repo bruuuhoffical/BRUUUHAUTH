@@ -6,6 +6,7 @@
   <title>BRUUUHAUTH</title>
   <link rel="stylesheet" href="../dist/output.css" />
   <link rel="stylesheet" href="output.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen gap-4">
   <h1 class="text-4xl font-bold mb-6">Welcome to BRUUUHAUTH</h1>
@@ -19,8 +20,8 @@
   import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
   const client = new Client()
-    .setEndpoint("https://cloud.appwrite.io/v1") // Use your endpoint
-    .setProject("bruuuhauth"); // Replace with your real Project ID
+    .setEndpoint("https://cloud.appwrite.io/v1")
+    .setProject("bruuuhauth");
 
   const account = new Account(client);
 
