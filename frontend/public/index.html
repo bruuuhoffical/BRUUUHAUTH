@@ -17,12 +17,10 @@
 <script type="module">
   import { account } from "../src/utils/appwrite.js";
 
-  // Trigger OAuth Login
   window.loginWith = (provider) => {
     account.createOAuth2Session(provider);
   };
 
-  // Try to get user info if already logged in
   try {
     const user = await account.get();
     document.body.innerHTML = `
@@ -34,8 +32,8 @@
     `;
 
     document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await account.deleteSessions(); // Logs out
-      location.reload(); // Refresh page
+      await account.deleteSessions();
+      location.reload();
     });
   } catch (err) {
     console.log("No user session yet. Waiting for login.");
