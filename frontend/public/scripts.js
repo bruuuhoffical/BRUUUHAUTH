@@ -1,3 +1,4 @@
+// ✅ FIXED scripts.js
 import { Client, Account, ID, Databases } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
 // Init Appwrite
@@ -8,13 +9,48 @@ const client = new Client()
 const account = new Account(client);
 const databases = new Databases(client);
 
+// ------------------------
+// TOAST NOTIFICATION SYSTEM
+// ------------------------
+function showToast(message, type = "info") {
+  const toast = document.createElement("div");
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+
+  Object.assign(toast.style, {
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    padding: "14px 20px",
+    background: type === "success" ? "#1f9d55" : type === "error" ? "#e53e3e" : "#2d3748",
+    color: "white",
+    borderRadius: "8px",
+    boxShadow: "0 0 12px rgba(0,0,0,0.5)",
+    zIndex: 9999,
+    fontSize: "14px",
+    opacity: 0,
+    transition: "opacity 0.4s ease"
+  });
+
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = 1 }, 50);
+  setTimeout(() => {
+    toast.style.opacity = 0;
+    setTimeout(() => toast.remove(), 400);
+  }, 3500);
+}
+
+window.showToast = showToast;
+
+// ------------------------
 // OAuth (Google, GitHub, Discord)
+// ------------------------
 window.loginWith = (provider) => {
   account.createOAuth2Session(provider, "https://bruuuhauth.vercel.app/setup.html");
 };
 
 // ------------------------
-// Email/Password Login
+// Email/Password Login (with optional 2FA)
 // ------------------------
 const loginBtn = document.querySelector(".login-container .login-btn");
 if (loginBtn) {
@@ -25,26 +61,24 @@ if (loginBtn) {
 
     try {
       await account.createEmailSession(emailOrUsername, password);
+      const user = await account.get();
 
-      const challenge = await account.createMfaChallenge();
-      
-      if (challenge && challenge.$id) {
+      if (user.mfa?.totp) {
+        const challenge = await account.createMfaChallenge();
         if (!twoFactorCode) {
-          alert("2FA code required.");
+          showToast("2FA code required.", "error");
           return;
         }
-
         await account.updateMfaChallenge(challenge.$id, twoFactorCode);
       }
 
-      alert("Login successful!");
+      showToast("Login successful!", "success");
       window.location.href = "dashboard.html";
     } catch (err) {
-      alert("Login failed: " + err.message);
+      showToast("Login failed: " + err.message, "error");
     }
   });
 }
-
 
 // ------------------------
 // Register New User
@@ -58,10 +92,10 @@ if (regBtn) {
 
     try {
       await account.create(ID.unique(), email, password, username);
-      alert("Registration successful. Redirecting to login...");
+      showToast("Registration successful. Redirecting to login...", "success");
       window.location.href = "login.html";
     } catch (err) {
-      alert("Register failed: " + err.message);
+      showToast("Register failed: " + err.message, "error");
     }
   });
 }
@@ -77,40 +111,40 @@ async function setupProfile() {
     const dob = document.getElementById("dob").value;
     const age = calculateAge(new Date(dob));
 
-    // Save to database
-    await databases.createDocument("users_db", "users", ID.unique(), {
+    // WARNING: Replace with your actual DB and Collection IDs
+    const databaseId = "bruuuhauth";
+    const collectionId = "bruuuhauth";
+
+    await databases.createDocument(databaseId, collectionId, ID.unique(), {
       userId: user.$id,
       username: username,
       dob: dob,
       age: age
     });
 
-    alert("Setup complete!");
+    showToast("Setup complete!", "success");
     window.location.href = "dashboard.html";
   } catch (err) {
-    alert("Failed to save profile: " + err.message);
+    showToast("Failed to save profile: " + err.message, "error");
   }
 }
+window.setupProfile = setupProfile;
 
-// Calculates age from DOB
 function calculateAge(dob) {
   const diff = Date.now() - dob.getTime();
   const ageDt = new Date(diff);
   return Math.abs(ageDt.getUTCFullYear() - 1970);
 }
 
-// Export setup for HTML use
-window.setupProfile = setupProfile;
-
-
+// ------------------------
 // Forgot password flow
+// ------------------------
 window.recoverPassword = async () => {
   const email = document.getElementById("recoveryEmail").value;
-
   try {
     await account.createRecovery(email, "https://bruuuhauth.vercel.app/reset.html");
-    alert("Password reset link sent. Check your inbox.");
+    showToast("Password reset link sent. Check your inbox.", "success");
   } catch (err) {
-    alert("Recovery failed: " + err.message);
+    showToast("Recovery failed: " + err.message, "error");
   }
 };
