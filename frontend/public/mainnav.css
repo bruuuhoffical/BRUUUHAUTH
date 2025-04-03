@@ -1,0 +1,65 @@
+.main-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #0d0d0d;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    margin-bottom: 2rem;
+  }
+  
+  .nav-left {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: rgba(196, 17, 4, 0.85);
+    flex: 1;
+  }
+  
+  .nav-center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-center li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .nav-center li a:hover {
+    color: #aaa;
+  }
+  
+  .nav-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
+  .client-area {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    background: rgba(196, 17, 4, 0.85);
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: background 0.3s;
+  }
+  
+  .client-area:hover {
+    background: rgba(99, 7, 0, 0.85);
+  }
+  .logoleft {
+    text-decoration: none;
+    color: rgba(196, 17, 4, 0.85);
+    font-family: "Bungee Shade", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }

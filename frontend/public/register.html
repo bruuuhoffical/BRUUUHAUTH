@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | BRUUUHAUTH</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+</head>
+<body>
+    <script>
+        if (!sessionStorage.getItem("verified")) {
+          window.location.href = "verify.html";
+        }
+      </script>
+      <div id="navbar-placeholder"></div>
+      <script>
+        fetch('mainnav.html')
+          .then(res => res.text())
+          .then(html => {
+            document.getElementById('navbar-placeholder').innerHTML = html;
+          });
+      </script>
+      <link rel="stylesheet" href="mainnav.css">
+      <div class="page-wrapper">
+
+        <div class="register-container">
+          <h1 class="title"><span class="gradient-text">BRUUUHAUTH</span></h1>
+          <h3 class="subheading">Create your account</h3>
+      
+          <input type="text" placeholder="Username" class="input" />
+          <input type="email" placeholder="Email" class="input" />
+          <input type="password" placeholder="Password" class="input" />
+          <input type="password" placeholder="Confirm Password" class="input" />
+      
+          <button class="login-btn">Register → </button>
+          <div class="divider">---------------- OR ----------------</div>
+          <div class="oauth-icons">
+              <img src="img/google32bg.png" alt="Google" onclick="loginWith('google')"/>
+              <img src="img/discord32.png" alt="Discord" onclick="loginWith('discord')"/>
+              <img src="img/github32bg.png" alt="GitHub" onclick="loginWith('github')"/>
+          </div>
+      
+          <div class="links">
+            <span>Already have an account ? |</span> <a href="login.html">Login</a>
+          </div>
+        </div>
+
+
+      </div>
+  <script type="module" src="scripts.js"></script>
+</body>
+</html>

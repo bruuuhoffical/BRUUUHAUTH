@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password | BRUUUHAUTH</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <script>
+    if (!sessionStorage.getItem("verified")) {
+      window.location.href = "verify.html";
+    }
+  </script>
+  <div id="navbar-placeholder"></div>
+  <script>
+    fetch('mainnav.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+      });
+  </script>
+  <link rel="stylesheet" href="mainnav.css">
+
+  <div class="page-wrapper">
+
+    <div class="reset-container">
+      <h1 class="gradient-text">Reset Password</h1>
+      <p class="subheading">Enter your new password below</p>
+  
+      <input type="password" id="newPassword" placeholder="New Password" class="input" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" class="input" required />
+      <button class="reset-btn" onclick="resetPassword()">Reset Password</button>
+      <div class="links">
+        <span>Already have an account ? |</span> <a href="login.html">Sign In</a><br><br>
+        <span>Don't have an account ? |</span> <a href="resgiter.html">Sign Up</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("bruuuhauth");
+
+    const account = new Account(client);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("userId");
+    const secret = urlParams.get("secret");
+
+    window.resetPassword = async () => {
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (!newPassword || !confirmPassword) {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      try {
+        await account.updateRecovery(userId, secret, newPassword, confirmPassword);
+        alert("Password reset successful. Redirecting to login...");
+        window.location.href = "login.html";
+      } catch (err) {
+        alert("Error resetting password: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

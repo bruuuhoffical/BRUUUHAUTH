@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BRUUUHAUTH | Verify</title>
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="output.css" />
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap');
+  
+    body {
+      font-family: 'Baloo 2', sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 1rem;
+    }
+  
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 30px; 
+      animation: bounce 1.5s infinite;
+    }
+  
+    .bounce {
+      animation: bounce 1.5s infinite;
+    }
+  
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-18px);
+      }
+    }
+  
+    p.subtitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+  
+    .cf-turnstile {
+      margin-top: 1rem;
+    }
+  
+    .ray-id {
+      filter: blur(5px);
+      transition: filter 0.3s ease;
+    }
+  
+    .ray-id:hover {
+      filter: none;
+    }
+  
+    a.button {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.5rem 1.25rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 0.375rem;
+      color: white;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+  
+    a.button:hover {
+      background: rgba(255,255,255,0.1);
+    }
+  </style>
+  
+  
+</head>
+<body>
+  <h1 class="text-6xl font-extrabold bounce">BRUUUHAUTH</h1><br>
+  <p class="text-gray-300 text-lg mt-4">Please wait while we validate your connection.</p>
+
+  <form id="verifyForm" class="mt-6">
+    <div
+      class="cf-turnstile"
+      data-sitekey="0x4AAAAAABDpjkPAwCBB9QXp"
+      data-callback="onVerified"
+    ></div>
+  </form>
+
+  <p class="mt-6 text-sm text-blue-400">
+    Ray ID: <span id="ray-id" class="ray-id">Loading...</span>
+  </p>
+
+  <a href="https://discord.gg/" target="_blank" class="button">Discord</a>
+
+  <script>
+    function onVerified(token) {
+      sessionStorage.setItem("verified", "true");
+      window.location.href = "login.html";
+    }
+
+    const ray = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+    document.getElementById("ray-id").textContent = ray.toUpperCase();
+  </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enable 2FA | BRUUUHAUTH</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="setup-container">
+    <h1 class="gradient-text">Two-Factor Authentication</h1>
+    <p class="subheading">Scan the QR code below in Google Authenticator</p>
+
+    <div id="qr-container" style="margin: 20px 0;"></div>
+
+    <input type="text" id="totpCode" placeholder="Enter 6-digit code" class="input" />
+    <button class="login-btn" onclick="verify2FA()">Enable 2FA</button>
+  </div>
+
+  <script type="module">
+    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("bruuuhauth");
+
+    const account = new Account(client);
+
+    let secret; // Needed for verification
+
+    // Step 1: Generate TOTP secret and show QR code
+    async function generateTOTP() {
+      try {
+        const res = await account.createMfaTotp();
+        secret = res.secret;
+
+        // Display QR code
+        const qr = await account.createMfaTotpQRCode();
+        const img = document.createElement("img");
+        img.src = qr.qr;
+        img.alt = "TOTP QR Code";
+        img.style.maxWidth = "200px";
+        document.getElementById("qr-container").appendChild(img);
+      } catch (err) {
+        alert("Failed to generate TOTP: " + err.message);
+      }
+    }
+
+    // Step 2: Verify TOTP code
+    window.verify2FA = async () => {
+      const code = document.getElementById("totpCode").value;
+
+      if (!code) return alert("Enter a code!");
+
+      try {
+        await account.updateMfaTotp(code);
+        alert("2FA Enabled!");
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert("Invalid code: " + err.message);
+      }
+    };
+
+    generateTOTP();
+  </script>
+</body>
+</html>
