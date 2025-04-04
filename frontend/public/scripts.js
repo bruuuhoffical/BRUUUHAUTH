@@ -46,7 +46,7 @@ window.showToast = showToast;
 // OAuth (Google, GitHub, Discord)
 // ------------------------
 window.loginWith = (provider) => {
-  account.createOAuth2Session(provider, "https://bruuuhauth.vercel.app/setup.html");
+  account.createOAuth2Session(provider, "https://bruuuhauth.vercel.app/main/dashboard.html");
 };
 
 // ------------------------

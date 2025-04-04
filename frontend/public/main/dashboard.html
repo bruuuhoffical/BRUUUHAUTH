@@ -2,13 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard | BRUUUHAUTH</title>
-  <link rel="stylesheet" href="../style.css" />
-  <link rel="stylesheet" href="../mainnav.css" />
+  <link rel="stylesheet" href="dashboard.css" />
   <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
 </head>
 <body>
+  <div class="layout">
+    <div id="sidebar-placeholder"></div>
+    <div class="main-content">
+      <div id="topnav-placeholder"></div>
+
+      <div class="dashboard-wrapper">
+        <h2>Welcome, <span id="username">Loading...</span></h2>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>Email</h4>
+            <p id="user-email">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>User ID</h4>
+            <p id="user-id">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>Created</h4>
+            <p id="created-date">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>2FA Status</h4>
+            <p id="mfa-status">Checking...</p>
+            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../2fa-setup.html'">Enable 2FA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    fetch('sidebar.html').then(res => res.text()).then(html => {
+      document.getElementById('sidebar-placeholder').innerHTML = html;
+    });
+    fetch('navbar.html').then(res => res.text()).then(html => {
+      document.getElementById('topnav-placeholder').innerHTML = html;
+    });
+  </script>
+
   <script type="module">
     import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
@@ -18,44 +57,29 @@
 
     const account = new Account(client);
 
-    // Protect page: redirect if not logged in
-    account.get().then(user => {
-      document.getElementById("username").textContent = user.name || user.email;
-      if (user.mfa?.totp) {
-        document.getElementById("mfa-status").textContent = "✅ Enabled";
-      } else {
-        document.getElementById("mfa-status").innerHTML = '❌ Not Enabled <a href="../2fa-setup.html">Enable Now</a>';
+    async function loadUser() {
+      try {
+        const user = await account.get();
+
+        document.getElementById("username").textContent = user.name || "User";
+        document.getElementById("user-email").textContent = user.email;
+        document.getElementById("user-id").textContent = user.$id;
+        document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+
+        if (user.mfa?.totp) {
+          document.getElementById("mfa-status").textContent = "✅ Enabled";
+        } else {
+          document.getElementById("mfa-status").textContent = "❌ Not Enabled";
+          document.getElementById("enable-2fa-btn").style.display = "inline-block";
+        }
+
+      } catch (err) {
+        console.error("Not logged in:", err.message);
+        window.location.href = "../login.html";
       }
-    }).catch(() => {
-      window.location.href = "../login.html";
-    });
+    }
 
-    // Logout function
-    window.logout = async () => {
-      await account.deleteSession("current");
-      window.location.href = "../login.html";
-    };
+    loadUser();
   </script>
-
-  <div id="navbar-placeholder"></div>
-  <script>
-    fetch('../mainnav.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('navbar-placeholder').innerHTML = html;
-      });
-  </script>
-
-  <main class="page-wrapper">
-    <div class="login-container">
-      <h1 class="title gradient-text">Welcome, <span id="username">...</span></h1>
-      <p class="subheading">Manage your BRUUUHAUTH profile</p>
-
-      <div class="links">
-        <strong>2FA Status:</strong> <span id="mfa-status">Checking...</span><br><br>
-        <button class="login-btn" onclick="logout()">Logout</button>
-      </div>
-    </div>
-  </main>
 </body>
 </html>
