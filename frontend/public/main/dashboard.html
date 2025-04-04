@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard | BRUUUHAUTH</title>
-  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="styles/dashboard.css" />
 </head>
 <body>
   <div class="layout">
@@ -31,7 +31,7 @@
           <div class="card">
             <h4>2FA Status</h4>
             <p id="mfa-status">Checking...</p>
-            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../2fa-setup.html'">Enable 2FA</button>
+            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../login/2fa-setup.html'">Enable 2FA</button>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
   <!-- Prevent loading page without login -->
   <script>
     if (!localStorage.getItem("userLoggedIn")) {
-      window.location.href = "../login.html";
+      window.location.href = "../login/login.html";
     }
   </script>
 
@@ -84,7 +84,7 @@
       } catch (err) {
         console.error("User not logged in:", err.message);
         localStorage.removeItem("userLoggedIn");
-        window.location.href = "../login.html";
+        window.location.href = "../login/login.html";
       }
     }
 
