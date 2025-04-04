@@ -100,47 +100,6 @@ if (regBtn) {
   });
 }
 
-// ------------------------
-// Setup Page (username + DOB for OAuth)
-// ------------------------
-
-// async function setupProfile() {
-//   try {
-//     const user = await account.get();
-
-//     const username = document.getElementById("username").value;
-//     const dob = document.getElementById("dob").value;
-//     const age = calculateAge(new Date(dob));
-
-//     const databaseId = "bruuuhauth"; 
-//     const collectionId = "bruuuhauth"; 
-
-//     await databases.createDocument(databaseId, collectionId, ID.unique(), {
-//       userId: user.$id,
-//       username: username,
-//       dob: dob,
-//       age: age
-//     });
-
-//     showToast("Setup complete!", "success");
-//     window.location.href = "../main/dashboard.html";
-//   } catch (err) {
-//     showToast("Failed to save profile: " + err.message, "error");
-//   }
-// }
-
-
-// window.setupProfile = setupProfile;
-
-// function calculateAge(dob) {
-//   const diff = Date.now() - dob.getTime();
-//   const ageDt = new Date(diff);
-//   return Math.abs(ageDt.getUTCFullYear() - 1970);
-// }
-
-// ------------------------
-// Forgot password flow
-// ------------------------
 window.recoverPassword = async () => {
   const email = document.getElementById("recoveryEmail").value;
   try {

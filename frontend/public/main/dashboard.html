@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Dashboard | BRUUUHAUTH</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="layout">
+    <div id="sidebar-placeholder"></div>
+    <div class="main-content">
+      <div id="topnav-placeholder"></div>
+
+      <div class="dashboard-wrapper">
+        <h2>🎉 Google Login Successful</h2>
+        <p>Your account email:</p>
+        <h3 id="user-email">Loading...</h3>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    fetch('sidebar.html').then(res => res.text()).then(html => {
+      document.getElementById('sidebar-placeholder').innerHTML = html;
+    });
+    fetch('navbar.html').then(res => res.text()).then(html => {
+      document.getElementById('topnav-placeholder').innerHTML = html;
+    });
+  </script>
+
+  <script type="module">
+    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("bruuuhauth");
+
+    const account = new Account(client);
+
+    async function loadEmail() {
+      try {
+        const user = await account.get();
+        document.getElementById("user-email").textContent = user.email;
+      } catch (err) {
+        console.error("User not logged in:", err.message);
+        window.location.href = "../login.html";
+      }
+    }
+
+    loadEmail();
+  </script>
+</body>
+</html>

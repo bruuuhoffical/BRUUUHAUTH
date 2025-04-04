@@ -53,7 +53,7 @@
       try {
         await account.updateMfaTotp(code);
         alert("2FA Enabled!");
-        window.location.href = "dashboard.html";
+        window.location.href = "main/dashboard.html";
       } catch (err) {
         alert("Invalid code: " + err.message);
       }
