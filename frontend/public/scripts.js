@@ -73,7 +73,7 @@ if (loginBtn) {
       }
 
       showToast("Login successful!", "success");
-      window.location.href = "dashboard.html";
+      window.location.href = "main/dashboard.html";
     } catch (err) {
       showToast("Login failed: " + err.message, "error");
     }
@@ -103,6 +103,7 @@ if (regBtn) {
 // ------------------------
 // Setup Page (username + DOB for OAuth)
 // ------------------------
+
 async function setupProfile() {
   try {
     const user = await account.get();
@@ -111,9 +112,8 @@ async function setupProfile() {
     const dob = document.getElementById("dob").value;
     const age = calculateAge(new Date(dob));
 
-    // WARNING: Replace with your actual DB and Collection IDs
-    const databaseId = "bruuuhauth";
-    const collectionId = "bruuuhauth";
+    const databaseId = "bruuuhauth"; 
+    const collectionId = "bruuuhauth"; 
 
     await databases.createDocument(databaseId, collectionId, ID.unique(), {
       userId: user.$id,
@@ -123,11 +123,13 @@ async function setupProfile() {
     });
 
     showToast("Setup complete!", "success");
-    window.location.href = "dashboard.html";
+    window.location.href = "main/dashboard.html";
   } catch (err) {
     showToast("Failed to save profile: " + err.message, "error");
   }
 }
+
+
 window.setupProfile = setupProfile;
 
 function calculateAge(dob) {

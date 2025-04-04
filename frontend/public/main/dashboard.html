@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | BRUUUHAUTH</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../mainnav.css" />
+  <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
+</head>
+<body>
+  <script type="module">
+    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("bruuuhauth");
+
+    const account = new Account(client);
+
+    // Protect page: redirect if not logged in
+    account.get().then(user => {
+      document.getElementById("username").textContent = user.name || user.email;
+      if (user.mfa?.totp) {
+        document.getElementById("mfa-status").textContent = "✅ Enabled";
+      } else {
+        document.getElementById("mfa-status").innerHTML = '❌ Not Enabled <a href="../2fa-setup.html">Enable Now</a>';
+      }
+    }).catch(() => {
+      window.location.href = "../login.html";
+    });
+
+    // Logout function
+    window.logout = async () => {
+      await account.deleteSession("current");
+      window.location.href = "../login.html";
+    };
+  </script>
+
+  <div id="navbar-placeholder"></div>
+  <script>
+    fetch('../mainnav.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+      });
+  </script>
+
+  <main class="page-wrapper">
+    <div class="login-container">
+      <h1 class="title gradient-text">Welcome, <span id="username">...</span></h1>
+      <p class="subheading">Manage your BRUUUHAUTH profile</p>
+
+      <div class="links">
+        <strong>2FA Status:</strong> <span id="mfa-status">Checking...</span><br><br>
+        <button class="login-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
