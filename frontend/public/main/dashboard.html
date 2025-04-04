@@ -40,9 +40,9 @@
 
   <!-- Prevent loading page without login -->
   <script>
-    if (!localStorage.getItem("userLoggedIn")) {
-      window.location.href = "../login/login.html";
-    }
+    // if (!localStorage.getItem("userLoggedIn")) {
+    //   window.location.href = "../login/login.html";
+    // }
   </script>
 
   <!-- Inject sidebar and topnav -->
@@ -83,8 +83,7 @@
 
       } catch (err) {
         console.error("User not logged in:", err.message);
-        localStorage.removeItem("userLoggedIn");
-        window.location.href = "../login/login.html";
+        // window.location.href = "../login/login.html";
       }
     }
 
