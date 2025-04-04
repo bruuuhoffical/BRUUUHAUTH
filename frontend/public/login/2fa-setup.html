@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Enable 2FA | BRUUUHAUTH</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles/style.css" />
+  <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
 </head>
 <body>
   <div class="setup-container">
@@ -26,15 +27,13 @@
 
     const account = new Account(client);
 
-    let secret; // Needed for verification
+    let secret;
 
-    // Step 1: Generate TOTP secret and show QR code
     async function generateTOTP() {
       try {
         const res = await account.createMfaTotp();
         secret = res.secret;
 
-        // Display QR code
         const qr = await account.createMfaTotpQRCode();
         const img = document.createElement("img");
         img.src = qr.qr;
@@ -46,7 +45,6 @@
       }
     }
 
-    // Step 2: Verify TOTP code
     window.verify2FA = async () => {
       const code = document.getElementById("totpCode").value;
 

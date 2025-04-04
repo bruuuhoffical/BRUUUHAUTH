@@ -73,7 +73,7 @@ if (loginBtn) {
       }
 
       showToast("Login successful!", "success");
-      window.location.href = "main/dashboard.html";
+      window.location.href = "../main/dashboard.html";
     } catch (err) {
       showToast("Login failed: " + err.message, "error");
     }
@@ -93,7 +93,7 @@ if (regBtn) {
     try {
       await account.create(ID.unique(), email, password, username);
       showToast("Registration successful. Redirecting to login...", "success");
-      window.location.href = "login.html";
+      window.location.href = "../login.html";
     } catch (err) {
       showToast("Register failed: " + err.message, "error");
     }
@@ -104,39 +104,39 @@ if (regBtn) {
 // Setup Page (username + DOB for OAuth)
 // ------------------------
 
-async function setupProfile() {
-  try {
-    const user = await account.get();
+// async function setupProfile() {
+//   try {
+//     const user = await account.get();
 
-    const username = document.getElementById("username").value;
-    const dob = document.getElementById("dob").value;
-    const age = calculateAge(new Date(dob));
+//     const username = document.getElementById("username").value;
+//     const dob = document.getElementById("dob").value;
+//     const age = calculateAge(new Date(dob));
 
-    const databaseId = "bruuuhauth"; 
-    const collectionId = "bruuuhauth"; 
+//     const databaseId = "bruuuhauth"; 
+//     const collectionId = "bruuuhauth"; 
 
-    await databases.createDocument(databaseId, collectionId, ID.unique(), {
-      userId: user.$id,
-      username: username,
-      dob: dob,
-      age: age
-    });
+//     await databases.createDocument(databaseId, collectionId, ID.unique(), {
+//       userId: user.$id,
+//       username: username,
+//       dob: dob,
+//       age: age
+//     });
 
-    showToast("Setup complete!", "success");
-    window.location.href = "main/dashboard.html";
-  } catch (err) {
-    showToast("Failed to save profile: " + err.message, "error");
-  }
-}
+//     showToast("Setup complete!", "success");
+//     window.location.href = "../main/dashboard.html";
+//   } catch (err) {
+//     showToast("Failed to save profile: " + err.message, "error");
+//   }
+// }
 
 
-window.setupProfile = setupProfile;
+// window.setupProfile = setupProfile;
 
-function calculateAge(dob) {
-  const diff = Date.now() - dob.getTime();
-  const ageDt = new Date(diff);
-  return Math.abs(ageDt.getUTCFullYear() - 1970);
-}
+// function calculateAge(dob) {
+//   const diff = Date.now() - dob.getTime();
+//   const ageDt = new Date(diff);
+//   return Math.abs(ageDt.getUTCFullYear() - 1970);
+// }
 
 // ------------------------
 // Forgot password flow

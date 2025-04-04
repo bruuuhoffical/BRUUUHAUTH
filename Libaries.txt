@@ -1,17 +1,3 @@
-# Navigate to your project directory
-cd "C:/Users/USER/Desktop/BRUUUHAUTH"
-
-# Initialize a Git repository (if not already initialized)
-git init
-
-# Add all files to the staging area
 git add .
-
-# Commit the changes
 git commit -m "Initial commit"
-
-# Add the remote repository (replace <your-repo-url> with your GitHub repository URL)
-git remote add origin <your-repo-url>
-
-# Push the changes to the main branch (replace 'main' with your branch name if different)
 git push -u origin main
