@@ -40,9 +40,9 @@
 
   <!-- Prevent loading page without login -->
   <script>
-    // if (!localStorage.getItem("userLoggedIn")) {
-    //   window.location.href = "../login/login.html";
-    // }
+    if (!localStorage.getItem("userLoggedIn")) {
+      window.location.href = "../login/login.html";
+    }
   </script>
 
   <!-- Inject sidebar and topnav -->
@@ -65,29 +65,36 @@
 
     const account = new Account(client);
 
-    async function loadUser() {
-      try {
-        const user = await account.get();
+    async function loadUser(retries = 5) {
+  try {
+    const user = await account.get();
 
-        document.getElementById("username").textContent = user.name || "User";
-        document.getElementById("user-email").textContent = user.email;
-        document.getElementById("user-id").textContent = user.$id;
-        document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+    document.getElementById("username").textContent = user.name || "User";
+    document.getElementById("user-email").textContent = user.email;
+    document.getElementById("user-id").textContent = user.$id;
+    document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
 
-        if (user.mfa?.totp) {
-          document.getElementById("mfa-status").textContent = "✅ Enabled";
-        } else {
-          document.getElementById("mfa-status").textContent = "❌ Not Enabled";
-          document.getElementById("enable-2fa-btn").style.display = "inline-block";
-        }
-
-      } catch (err) {
-        console.error("User not logged in:", err.message);
-        // window.location.href = "../login/login.html";
-      }
+    if (user.mfa?.totp) {
+      document.getElementById("mfa-status").textContent = "✅ Enabled";
+    } else {
+      document.getElementById("mfa-status").textContent = "❌ Not Enabled";
+      document.getElementById("enable-2fa-btn").style.display = "inline-block";
     }
 
-    loadUser();
+  } catch (err) {
+    if (retries > 0) {
+      console.warn("Retrying session...", retries);
+      setTimeout(() => loadUser(retries - 1), 1000);
+    } else {
+      console.error("Session not found:", err.message);
+      localStorage.removeItem("userLoggedIn");
+      window.location.href = "../login/login.html";
+    }
+  }
+}
+
+loadUser();
+
   </script>
 </body>
 </html>
