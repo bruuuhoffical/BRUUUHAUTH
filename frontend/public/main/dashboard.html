@@ -57,50 +57,69 @@
 <script type="module">
   import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
-  // ✅ STEP 1: Cookie helper
+  // Cookie helper
   function getCookie(name) {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? match[2] : null;
   }
 
-  // ✅ STEP 2: Setup Appwrite
   const client = new Client()
     .setEndpoint("https://cloud.appwrite.io/v1")
     .setProject("bruuuhauth");
 
   const account = new Account(client);
 
-  // ✅ STEP 3: Use token from cookie
   const token = getCookie("bruh_token");
   if (token) {
-    client.setSession(token); // tells Appwrite which session to use
+    client.setSession(token); // use the session token manually
   }
 
-  // ✅ STEP 4: Load user
-  async function loadUser() {
+  const usernameEl = document.getElementById("username");
+  const emailEl = document.getElementById("user-email");
+  const userIdEl = document.getElementById("user-id");
+  const createdEl = document.getElementById("created-date");
+  const mfaEl = document.getElementById("mfa-status");
+  const mfaBtn = document.getElementById("enable-2fa-btn");
+
+  usernameEl.textContent = "Loading user...";
+  emailEl.textContent = "";
+  userIdEl.textContent = "";
+  createdEl.textContent = "";
+  mfaEl.textContent = "Checking...";
+
+  async function loadUser(retries = 5) {
     try {
       const user = await account.get();
 
-      document.getElementById("username").textContent = user.name || "User";
-      document.getElementById("user-email").textContent = user.email;
-      document.getElementById("user-id").textContent = user.$id;
-      document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+      usernameEl.textContent = user.name || "User";
+      emailEl.textContent = user.email;
+      userIdEl.textContent = user.$id;
+      createdEl.textContent = new Date(user.$createdAt).toLocaleString();
 
       if (user.mfa?.totp) {
-        document.getElementById("mfa-status").textContent = "✅ Enabled";
+        mfaEl.textContent = "✅ Enabled";
       } else {
-        document.getElementById("mfa-status").textContent = "❌ Not Enabled";
-        document.getElementById("enable-2fa-btn").style.display = "inline-block";
+        mfaEl.textContent = "❌ Not Enabled";
+        mfaBtn.style.display = "inline-block";
       }
 
     } catch (err) {
-      console.error("Session error:", err.message);
-      window.location.href = "../login/login.html";
+      if (retries > 0) {
+        setTimeout(() => loadUser(retries - 1), 1000);
+      } else {
+        usernameEl.textContent = "❌ Not logged in";
+        emailEl.textContent = "Session failed";
+        userIdEl.textContent = "-";
+        createdEl.textContent = "-";
+        mfaEl.textContent = "-";
+        mfaBtn.style.display = "none";
+      }
     }
   }
 
   loadUser();
 </script>
+
 
 </body>
 </html>
