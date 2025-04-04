@@ -6,6 +6,13 @@
   <title>Dashboard | BRUUUHAUTH</title>
   <link rel="stylesheet" href="styles/dashboard.css" />
 </head>
+<script>
+  if (!document.cookie.includes("bruh_token") || !document.cookie.includes("bruh_id")) {
+    window.location.href = "../login/login.html";
+  }
+</script>
+
+
 <body>
   <div class="layout">
     <div id="sidebar-placeholder"></div>
@@ -37,15 +44,7 @@
       </div>
     </div>
   </div>
-
-  <!-- Prevent loading page without login -->
-  <script>
-    if (!localStorage.getItem("userLoggedIn")) {
-      window.location.href = "../login/login.html";
-    }
-  </script>
-
-  <!-- Inject sidebar and topnav -->
+  
   <script>
     fetch('sidebar.html').then(res => res.text()).then(html => {
       document.getElementById('sidebar-placeholder').innerHTML = html;
@@ -55,46 +54,53 @@
     });
   </script>
 
-  <!-- Load user info -->
-  <script type="module">
-    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+<script type="module">
+  import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
-    const client = new Client()
-      .setEndpoint("https://cloud.appwrite.io/v1")
-      .setProject("bruuuhauth");
+  // ✅ STEP 1: Cookie helper
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+  }
 
-    const account = new Account(client);
+  // ✅ STEP 2: Setup Appwrite
+  const client = new Client()
+    .setEndpoint("https://cloud.appwrite.io/v1")
+    .setProject("bruuuhauth");
 
-    async function loadUser(retries = 5) {
-  try {
-    const user = await account.get();
+  const account = new Account(client);
 
-    document.getElementById("username").textContent = user.name || "User";
-    document.getElementById("user-email").textContent = user.email;
-    document.getElementById("user-id").textContent = user.$id;
-    document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+  // ✅ STEP 3: Use token from cookie
+  const token = getCookie("bruh_token");
+  if (token) {
+    client.setSession(token); // tells Appwrite which session to use
+  }
 
-    if (user.mfa?.totp) {
-      document.getElementById("mfa-status").textContent = "✅ Enabled";
-    } else {
-      document.getElementById("mfa-status").textContent = "❌ Not Enabled";
-      document.getElementById("enable-2fa-btn").style.display = "inline-block";
-    }
+  // ✅ STEP 4: Load user
+  async function loadUser() {
+    try {
+      const user = await account.get();
 
-  } catch (err) {
-    if (retries > 0) {
-      console.warn("Retrying session...", retries);
-      setTimeout(() => loadUser(retries - 1), 1000);
-    } else {
-      console.error("Session not found:", err.message);
-      localStorage.removeItem("userLoggedIn");
+      document.getElementById("username").textContent = user.name || "User";
+      document.getElementById("user-email").textContent = user.email;
+      document.getElementById("user-id").textContent = user.$id;
+      document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+
+      if (user.mfa?.totp) {
+        document.getElementById("mfa-status").textContent = "✅ Enabled";
+      } else {
+        document.getElementById("mfa-status").textContent = "❌ Not Enabled";
+        document.getElementById("enable-2fa-btn").style.display = "inline-block";
+      }
+
+    } catch (err) {
+      console.error("Session error:", err.message);
       window.location.href = "../login/login.html";
     }
   }
-}
 
-loadUser();
+  loadUser();
+</script>
 
-  </script>
 </body>
 </html>

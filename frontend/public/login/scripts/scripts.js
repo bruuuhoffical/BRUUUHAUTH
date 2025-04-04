@@ -74,7 +74,15 @@ if (loginBtn) {
 
       showToast("Login successful!", "success");
       localStorage.setItem("userLoggedIn", "true");
-      window.location.href = "../main/dashboard.html";
+      const session = await account.getSession("current");
+
+      document.cookie = `bruh_id=${session.userId}; path=/`;
+      document.cookie = `bruh_token=${session.secret}; path=/`;
+
+      console.log("Cookie set: ", session.userId);
+
+      window.location.href = "main/dashboard.html";
+
     } catch (err) {
       showToast("Login failed: " + err.message, "error");
     }
