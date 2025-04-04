@@ -6,8 +6,6 @@
   <title>Dashboard | BRUUUHAUTH</title>
   <link rel="stylesheet" href="styles/dashboard.css" />
 </head>
-
-
 <body>
   <div class="layout">
     <div id="sidebar-placeholder"></div>
@@ -15,7 +13,7 @@
       <div id="topnav-placeholder"></div>
 
       <div class="dashboard-wrapper">
-        <h2>Welcome, <span id="username">Loading...</span></h2>
+        <h2>Welcome, <span id="username">Loading user...</span></h2>
 
         <div class="card-grid">
           <div class="card">
@@ -33,88 +31,64 @@
           <div class="card">
             <h4>2FA Status</h4>
             <p id="mfa-status">Checking...</p>
-            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../login/2fa-setup.html'">Enable 2FA</button>
+            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../2fa-setup.html'">Enable 2FA</button>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Load sidebar and topnav -->
   <script>
-    fetch('sidebar.html').then(res => res.text()).then(html => {
+    fetch('../sidebar.html').then(res => res.text()).then(html => {
       document.getElementById('sidebar-placeholder').innerHTML = html;
     });
-    fetch('navbar.html').then(res => res.text()).then(html => {
+    fetch('../navbar.html').then(res => res.text()).then(html => {
       document.getElementById('topnav-placeholder').innerHTML = html;
     });
   </script>
 
-<script type="module">
-  import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
+  <!-- Load Appwrite user -->
+  <script type="module">
+    import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
-  // Cookie helper
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
-  }
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("bruuuhauth");
 
-  const client = new Client()
-    .setEndpoint("https://cloud.appwrite.io/v1")
-    .setProject("bruuuhauth");
+    const account = new Account(client);
 
-  const account = new Account(client);
+    async function loadUser(retries = 5) {
+      try {
+        const user = await account.get();
 
-  const token = getCookie("bruh_token");
-  if (token) {
-    client.setSession(token); // use the session token manually
-  }
+        document.getElementById("username").textContent = user.name || "User";
+        document.getElementById("user-email").textContent = user.email;
+        document.getElementById("user-id").textContent = user.$id;
+        document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
 
-  const usernameEl = document.getElementById("username");
-  const emailEl = document.getElementById("user-email");
-  const userIdEl = document.getElementById("user-id");
-  const createdEl = document.getElementById("created-date");
-  const mfaEl = document.getElementById("mfa-status");
-  const mfaBtn = document.getElementById("enable-2fa-btn");
+        if (user.mfa?.totp) {
+          document.getElementById("mfa-status").textContent = "✅ Enabled";
+        } else {
+          document.getElementById("mfa-status").textContent = "❌ Not Enabled";
+          document.getElementById("enable-2fa-btn").style.display = "inline-block";
+        }
 
-  usernameEl.textContent = "Loading user...";
-  emailEl.textContent = "";
-  userIdEl.textContent = "";
-  createdEl.textContent = "";
-  mfaEl.textContent = "Checking...";
-
-  async function loadUser(retries = 5) {
-    try {
-      const user = await account.get();
-
-      usernameEl.textContent = user.name || "User";
-      emailEl.textContent = user.email;
-      userIdEl.textContent = user.$id;
-      createdEl.textContent = new Date(user.$createdAt).toLocaleString();
-
-      if (user.mfa?.totp) {
-        mfaEl.textContent = "✅ Enabled";
-      } else {
-        mfaEl.textContent = "❌ Not Enabled";
-        mfaBtn.style.display = "inline-block";
-      }
-
-    } catch (err) {
-      if (retries > 0) {
-        setTimeout(() => loadUser(retries - 1), 1000);
-      } else {
-        usernameEl.textContent = "❌ Not logged in";
-        emailEl.textContent = "Session failed";
-        userIdEl.textContent = "-";
-        createdEl.textContent = "-";
-        mfaEl.textContent = "-";
-        mfaBtn.style.display = "none";
+      } catch (err) {
+        if (retries > 0) {
+          console.log("Retrying session...", retries);
+          setTimeout(() => loadUser(retries - 1), 1000);
+        } else {
+          document.getElementById("username").textContent = "❌ Not logged in";
+          document.getElementById("user-email").textContent = "Session failed";
+          document.getElementById("user-id").textContent = "-";
+          document.getElementById("created-date").textContent = "-";
+          document.getElementById("mfa-status").textContent = "-";
+        }
       }
     }
-  }
 
-  loadUser();
-</script>
-
-
+    loadUser();
+  </script>
 </body>
 </html>
