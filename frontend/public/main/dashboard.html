@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Test Dashboard | BRUUUHAUTH</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | BRUUUHAUTH</title>
   <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
@@ -12,13 +13,39 @@
       <div id="topnav-placeholder"></div>
 
       <div class="dashboard-wrapper">
-        <h2>🎉 Google Login Successful</h2>
-        <p>Your account email:</p>
-        <h3 id="user-email">Loading...</h3>
+        <h2>Welcome, <span id="username">Loading...</span></h2>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>Email</h4>
+            <p id="user-email">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>User ID</h4>
+            <p id="user-id">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>Created</h4>
+            <p id="created-date">Loading...</p>
+          </div>
+          <div class="card">
+            <h4>2FA Status</h4>
+            <p id="mfa-status">Checking...</p>
+            <button id="enable-2fa-btn" style="display: none;" onclick="location.href='../2fa-setup.html'">Enable 2FA</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Prevent loading page without login -->
+  <script>
+    if (!localStorage.getItem("userLoggedIn")) {
+      window.location.href = "../login.html";
+    }
+  </script>
+
+  <!-- Inject sidebar and topnav -->
   <script>
     fetch('sidebar.html').then(res => res.text()).then(html => {
       document.getElementById('sidebar-placeholder').innerHTML = html;
@@ -28,6 +55,7 @@
     });
   </script>
 
+  <!-- Load user info -->
   <script type="module">
     import { Client, Account } from "https://cdn.jsdelivr.net/npm/appwrite@13.0.1/+esm";
 
@@ -37,17 +65,30 @@
 
     const account = new Account(client);
 
-    async function loadEmail() {
+    async function loadUser() {
       try {
         const user = await account.get();
+
+        document.getElementById("username").textContent = user.name || "User";
         document.getElementById("user-email").textContent = user.email;
+        document.getElementById("user-id").textContent = user.$id;
+        document.getElementById("created-date").textContent = new Date(user.$createdAt).toLocaleString();
+
+        if (user.mfa?.totp) {
+          document.getElementById("mfa-status").textContent = "✅ Enabled";
+        } else {
+          document.getElementById("mfa-status").textContent = "❌ Not Enabled";
+          document.getElementById("enable-2fa-btn").style.display = "inline-block";
+        }
+
       } catch (err) {
         console.error("User not logged in:", err.message);
+        localStorage.removeItem("userLoggedIn");
         window.location.href = "../login.html";
       }
     }
 
-    loadEmail();
+    loadUser();
   </script>
 </body>
 </html>

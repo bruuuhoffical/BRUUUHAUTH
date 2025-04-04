@@ -73,6 +73,7 @@ if (loginBtn) {
       }
 
       showToast("Login successful!", "success");
+      localStorage.setItem("userLoggedIn", "true");
       window.location.href = "../main/dashboard.html";
     } catch (err) {
       showToast("Login failed: " + err.message, "error");
